@@ -4,3 +4,6 @@
 # generated files
 bin/
 gen/
+
+# Subversion subdirectories
+.svn*
