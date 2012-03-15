@@ -1,0 +1,6 @@
++-++-++-++-+
+|R||i||t||e| version: 1.0
++-++-++-++-+
+rite: (noun) any customary observance or practice
+
+The packages in rite form a pilot job framework written purely in Java. MongoDB is used as storage for job descriptions.  
