@@ -53,7 +53,7 @@ public class Rite {
 
     public enum PropertyKeys {
         ID("identifier", null), TICK("tickrate", "30000"), HOST("hostfile", "host.properties"), LIFETIME("lifetime", "86400000"), INTERVAL("interval", "60000"), RELIC("relicfile", "relic.properties"), LISTFILES(
-                "listfiles", "true"), SCRUBDELAY("scrubdelay", "120000"), IDLEDELAY("idledelay", "120000"), MAXFAILURES("maxfailures", "3"), MAXSCRUBS("maxscrubs", "20");
+                "listfiles", "true"), SCRUBDELAY("scrubdelay", "120000"), IDLEDELAY("idledelay", "120000"), MAXFAILURES("maxfailures", "3"), MAXSCRUBS("maxscrubs", "20"), MAXRECIPES("maxrecipes", "-1");
 
         private final String key;
         private final String defaultValue;
@@ -95,6 +95,7 @@ public class Rite {
     private boolean halt = false;
     private int failures = 0;
     private int scrubs = 0;
+    private int recipes = 0;
 
     public static Rite getInstance() {
         if (instance == null) {
@@ -192,6 +193,7 @@ public class Rite {
                 long idleDelay = Long.parseLong(getProperty(PropertyKeys.IDLEDELAY));
                 int maxFailures = Integer.parseInt(getProperty(PropertyKeys.MAXFAILURES));
                 int maxScrubs = Integer.parseInt(getProperty(PropertyKeys.MAXSCRUBS));
+                int maxRecipes = Integer.parseInt(getProperty(PropertyKeys.MAXRECIPES));
                 while (!lifeTimeExceeded() && !halt) {
                     // Check commands
                     ClientCommand co = rh.getClientCommand(identifier);
@@ -265,13 +267,6 @@ public class Rite {
                                         r = recipeCooker.getRecipe();
                                         recipeCooker.removeRecipe();
                                         rh.releaseRecipe(r);
-                                        if(r.hasFailed()) {
-                                            failures ++;
-                                        }                  
-                                        if(failures > maxFailures) {
-                                            System.out.println("The maximum number of failures has been reached. This client will shutdown...");
-                                            halt = true;
-                                        }
                                         System.out.println("=== MARK: " + TimeStamp.dateToString(new Date()) + " ===");
                                         return;
                                     }
@@ -279,7 +274,7 @@ public class Rite {
                                 r = recipeCooker.getRecipe();
                                 recipeCooker.removeRecipe();
                                 rh.releaseRecipe(r);
-                                // FIXME duplication of code
+                                recipes++;
                                 if(r.hasFailed()) {
                                     failures ++;
                                 }                  
@@ -287,6 +282,11 @@ public class Rite {
                                     System.out.println("The maximum number of recipe failures has been reached. This client will shutdown...");
                                     halt = true;
                                 }
+                                if(maxRecipes > -1 && recipes >= maxRecipes) {
+                                	System.out.println("The maximum number of completed recipes has been reached. This client will shutdown...");
+                                    halt = true;
+                                }
+                                
                                 System.out.println("=== MARK: " + TimeStamp.dateToString(new Date()) + " ===");
                                 System.setOut(System.out);
                                 System.setErr(System.err);
