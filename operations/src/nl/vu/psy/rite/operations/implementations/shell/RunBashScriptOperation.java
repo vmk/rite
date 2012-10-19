@@ -3,6 +3,7 @@ package nl.vu.psy.rite.operations.implementations.shell;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.UUID;
 
 import nl.vu.psy.rite.operations.Operation;
 import nl.vu.psy.rite.operations.OperationPropertyKeys;
@@ -51,7 +52,7 @@ public class RunBashScriptOperation extends GenericOperation {
     @Override
     public Operation call() throws Exception {
         try {
-        	File f = new File("script.sh");
+        	File f = new File(UUID.randomUUID()+ ".sh");
         	BufferedWriter bw = new BufferedWriter(new FileWriter(f));
         	bw.write(getScript());
         	bw.flush();
