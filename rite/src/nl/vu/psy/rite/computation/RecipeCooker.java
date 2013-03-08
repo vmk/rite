@@ -127,15 +127,18 @@ public class RecipeCooker extends TimerTask {
                     if (o == null) {
                         o = op.getOperation();
                         o.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(new RiteException("The operation retrieved from the FutureTask was null!")));
+                        o.fail();
                         o.complete();
                     }
                 } catch (InterruptedException e) {
                     o = op.getOperation();
                     o.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
+                    o.fail();
                     o.complete();
                 } catch (ExecutionException e) {
                     o = op.getOperation();
                     o.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
+                    o.fail();
                     o.complete();
                 }
                 int index = 0;

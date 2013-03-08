@@ -100,6 +100,7 @@ public class BasicCommandLineOperation extends GenericOperation {
     public Operation call() throws Exception {
         try {
             String commandLine = getCommandLine();
+            System.out.println("Running commandline: " + commandLine);
             StringTokenizer st = new StringTokenizer(commandLine, " ");
             ArrayList<String> argumentList = new ArrayList<String>();
             while (st.hasMoreTokens()) {
