@@ -28,6 +28,8 @@ import nl.vu.psy.relic.resolvers.ResolverDescriptor;
 public interface RelicStore {
 
     public abstract Relic getRelic(String relicId);
+    
+    public abstract Relic[] getAllRelics();
 
     public abstract ResolverDescriptor getResolverDescriptor(String relicId, String environment);
 
