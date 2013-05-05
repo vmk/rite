@@ -18,6 +18,7 @@
 package nl.vu.psy.rite.operations.implementations.fileresolution;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import nl.vu.psy.rite.FileCache;
 import nl.vu.psy.rite.Rite;
@@ -32,78 +33,83 @@ import nl.vu.psy.rite.operations.implementations.OperationUtilities;
  * @author vm.kattenberg
  */
 public class CopyInOperation extends GenericOperation {
-    private static final long serialVersionUID = 4375372204584024107L;
+	private static final long serialVersionUID = 4375372204584024107L;
 
-    public enum PropertyKeys implements OperationPropertyKeys {
-        RELIC("relic", "", false), CHECKEXISTS("checkexists", "false", false);
+	public enum PropertyKeys implements OperationPropertyKeys {
+		RELIC("relic", "", false), TRIES("tries", "1", false);
 
-        private final String key;
-        private final String defaultValue;
-        private final boolean nullable;
+		private final String key;
+		private final String defaultValue;
+		private final boolean nullable;
 
-        private PropertyKeys(String key, String defaultValue, boolean nullable) {
-            this.key = key;
-            this.defaultValue = defaultValue;
-            this.nullable = nullable;
-        }
+		private PropertyKeys(String key, String defaultValue, boolean nullable) {
+			this.key = key;
+			this.defaultValue = defaultValue;
+			this.nullable = nullable;
+		}
 
-        @Override
-        public String getDefaultValue() {
-            return defaultValue;
-        }
+		@Override
+		public String getDefaultValue() {
+			return defaultValue;
+		}
 
-        @Override
-        public String getKey() {
-            return key;
-        }
+		@Override
+		public String getKey() {
+			return key;
+		}
 
-        @Override
-        public boolean isNullable() {
-            return nullable;
-        }
-    }
+		@Override
+		public boolean isNullable() {
+			return nullable;
+		}
+	}
 
-    public CopyInOperation() {
-        super();
-        OperationUtilities.initialize(this, PropertyKeys.values());
-    }
+	public CopyInOperation() {
+		super();
+		OperationUtilities.initialize(this, PropertyKeys.values());
+	}
 
-    @Override
-    public Operation call() throws Exception {
-        try {
-            FileCache fileCache = Rite.getInstance().getFileCache();
-            fileCache.getFileCache().importRelic(getRelicId());
-            if (checkExists()) {
-                File f = fileCache.getFileCache().getRelic(getRelicId(), false);
-                if (!f.exists()) {
-                    this.setProperty(GenericOperation.PropertyKeys.ERROR, "The file " + f.getAbsolutePath() + " does not exist!");
-                    this.fail();
-                }
-            }
-        } catch (Exception e) {
-            this.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
-            this.fail();
-            this.complete();
-            return this;
-        }
-        this.complete();
-        return this;
-    }
+	@Override
+	public Operation call() throws Exception {
+		int numtries = getNumTries();
+		boolean succes = false;
+		while (!succes && numtries > 0) {
+			try {
+				FileCache fileCache = Rite.getInstance().getFileCache();
+				fileCache.getFileCache().importRelic(getRelicId());
+				File f = fileCache.getFileCache().getRelic(getRelicId(), false);
+				if (!f.exists()) {
+					throw new FileNotFoundException("Checking the local file. The file " + f.getAbsolutePath() + " does not exist!");
+				}
+				succes = true;
+			} catch (Exception e) {
+				numtries--;
+				if (numtries == 0) {
+					this.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
+					this.fail();
+					this.complete();
+					return this;
+				}
+			}
+		}
+		this.complete();
+		return this;
+	}
 
-    public void setCheckExists(boolean check) {
-        setProperty(PropertyKeys.CHECKEXISTS, Boolean.toString(check));
-    }
+	public void setRelicId(String relicId) {
+		setProperty(PropertyKeys.RELIC, relicId);
+	}
 
-    public boolean checkExists() {
-        return Boolean.parseBoolean(getProperty(PropertyKeys.CHECKEXISTS));
-    }
+	public String getRelicId() {
+		return getProperty(PropertyKeys.RELIC);
+	}
 
-    public void setRelicId(String relicId) {
-        setProperty(PropertyKeys.RELIC, relicId);
-    }
+	public void setNumTries(int numtries) {
+		setProperty(PropertyKeys.TRIES, Integer.toString(numtries));
+	}
 
-    public String getRelicId() {
-        return getProperty(PropertyKeys.RELIC);
-    }
+	public int getNumTries() {
+		return Integer.parseInt(getProperty(PropertyKeys.TRIES));
+	}
 
 }

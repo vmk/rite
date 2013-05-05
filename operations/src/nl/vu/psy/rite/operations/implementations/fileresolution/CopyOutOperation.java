@@ -17,6 +17,9 @@
 
 package nl.vu.psy.rite.operations.implementations.fileresolution;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import nl.vu.psy.relic.exceptions.RelicException;
 import nl.vu.psy.rite.FileCache;
 import nl.vu.psy.rite.Rite;
@@ -31,86 +34,120 @@ import nl.vu.psy.rite.operations.implementations.OperationUtilities;
  * @author vm.kattenberg
  */
 public class CopyOutOperation extends GenericOperation {
-    private static final long serialVersionUID = 4375372204584024107L;
+	private static final long serialVersionUID = 4375372204584024107L;
 
-    public enum PropertyKeys implements OperationPropertyKeys {
-        RELIC("relic", "", false), DELETEONRESET("deleteonreset", "false", false);
+	public enum PropertyKeys implements OperationPropertyKeys {
+		RELIC("relic", "", false), DELETEONRESET("deleteonreset", "false", false), TRIES("tries", "1", false);
 
-        private final String key;
-        private final String defaultValue;
-        private final boolean nullable;
+		private final String key;
+		private final String defaultValue;
+		private final boolean nullable;
 
-        private PropertyKeys(String key, String defaultValue, boolean nullable) {
-            this.key = key;
-            this.defaultValue = defaultValue;
-            this.nullable = nullable;
-        }
+		private PropertyKeys(String key, String defaultValue, boolean nullable) {
+			this.key = key;
+			this.defaultValue = defaultValue;
+			this.nullable = nullable;
+		}
 
-        @Override
-        public String getDefaultValue() {
-            return defaultValue;
-        }
+		@Override
+		public String getDefaultValue() {
+			return defaultValue;
+		}
 
-        @Override
-        public String getKey() {
-            return key;
-        }
+		@Override
+		public String getKey() {
+			return key;
+		}
 
-        @Override
-        public boolean isNullable() {
-            return nullable;
-        }
-    }
+		@Override
+		public boolean isNullable() {
+			return nullable;
+		}
+	}
 
-    public CopyOutOperation() {
-        super();
-        OperationUtilities.initialize(this, PropertyKeys.values());
-    }
+	public CopyOutOperation() {
+		super();
+		OperationUtilities.initialize(this, PropertyKeys.values());
+	}
 
-    @Override
-    public Operation call() throws Exception {
-        try {
-            FileCache fileCache = Rite.getInstance().getFileCache();
-            fileCache.getFileCache().exportRelic(getRelicId());
-        } catch (Exception e) {
-            this.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
-            this.fail();
-            this.complete();
-            return this;
-        }
-        this.complete();
-        return this;
-    }
+	@Override
+	public Operation call() throws Exception {
+		int numtries = getNumTries();
+		boolean succes = false;
+		while (!succes && numtries > 0) {
+			try {
+				FileCache fileCache = Rite.getInstance().getFileCache();
+				File f = fileCache.getFileCache().getRelic(getRelicId(), false);
+				if (!f.exists()) {
+					throw new FileNotFoundException("Checking the local file. The file " + f.getAbsolutePath() + " does not exist!");
+				}
+				fileCache.getFileCache().exportRelic(getRelicId());
+				succes = true;
+			} catch (Exception e) {
+				numtries--;
+				if (numtries == 0) {
+					this.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
+					this.fail();
+					this.complete();
+					return this;
+				}
+			}
+		}
+		this.complete();
+		return this;
+	}
 
-    public void setRelicId(String relicId) {
-        setProperty(PropertyKeys.RELIC, relicId);
-    }
+	public void setRelicId(String relicId) {
+		setProperty(PropertyKeys.RELIC, relicId);
+	}
 
-    public String getRelicId() {
-        return getProperty(PropertyKeys.RELIC);
-    }
+	public String getRelicId() {
+		return getProperty(PropertyKeys.RELIC);
+	}
 
-    public void setDeleteOnReset(boolean delete) {
-        setProperty(PropertyKeys.DELETEONRESET, Boolean.toString(delete));
-    }
+	public void setDeleteOnReset(boolean delete) {
+		setProperty(PropertyKeys.DELETEONRESET, Boolean.toString(delete));
+	}
 
-    public boolean deleteOnReset() {
-        return Boolean.parseBoolean(getProperty(PropertyKeys.DELETEONRESET));
-    }
+	public boolean deleteOnReset() {
+		return Boolean.parseBoolean(getProperty(PropertyKeys.DELETEONRESET));
+	}
 
-    @Override
-    public void reset() {
-        super.reset();
-        boolean delete = Boolean.parseBoolean(getProperty(PropertyKeys.DELETEONRESET));
-        if (delete) {
-            // Delete external copy
-            FileCache fileCache = Rite.getInstance().getFileCache();
-            try {
-                fileCache.getFileCache().clearRemote(getProperty(PropertyKeys.RELIC));
-            } catch (RelicException e) {
-                // FIXME and what happens in this case? The operation is flagged as reset and will be executed again
-                System.out.println("Reset copyout: could not clear remote copy - " + e.getMessage());
-            }
-        }
-    }
+	public void setNumTries(int numtries) {
+		setProperty(PropertyKeys.TRIES, Integer.toString(numtries));
+	}
+
+	public int getNumTries() {
+		return Integer.parseInt(getProperty(PropertyKeys.TRIES));
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		boolean delete = deleteOnReset();
+		if (delete) {
+			FileCache fileCache = Rite.getInstance().getFileCache();
+
+			// Check local copy and delete if there
+			try {
+				File f = fileCache.getFileCache().getRelic(getRelicId(), false);
+				if (f.exists()) {
+					fileCache.getFileCache().clearLocal(getRelicId());
+				}
+			} catch (RelicException e1) {
+				// NOP
+			}
+
+			// Delete external copy
+			try {
+				fileCache.getFileCache().clearRemote(getRelicId());
+			} catch (RelicException e) {
+				// FIXME and what happens in this case? The operation is flagged
+				// as reset and will be executed again
+				System.out.println("Reset copyout: could not clear remote copy - " + e.getMessage());
+				this.fail();
+				this.complete();
+			}
+		}
+	}
 }
