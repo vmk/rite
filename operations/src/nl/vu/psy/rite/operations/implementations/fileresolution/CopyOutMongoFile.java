@@ -60,6 +60,9 @@ public class CopyOutMongoFile extends GenericOperation {
 			GridFS gfs = new GridFS(db);
 			String filename = getFileName();
 			File f = new File(filename);
+			if (!f.exists()) {
+				throw new Exception("The file " + filename + " does not exist locally!");
+			}
 			GridFSInputFile gsampleFile = gfs.createFile(f);
 			gsampleFile.setFilename(f.getName());
 			gsampleFile.save();
@@ -114,7 +117,7 @@ public class CopyOutMongoFile extends GenericOperation {
 	}
 
 	public int getPort() {
-		return Integer.parseInt(getProperty(PropertyKeys.HOST));
+		return Integer.parseInt(getProperty(PropertyKeys.PORT));
 	}
 
 	public void setDbName(String dbName) {
