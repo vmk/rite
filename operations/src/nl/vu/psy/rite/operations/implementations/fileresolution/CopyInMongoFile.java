@@ -1,7 +1,10 @@
 package nl.vu.psy.rite.operations.implementations.fileresolution;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 
+import nl.vu.psy.rite.Rite;
 import nl.vu.psy.rite.operations.Operation;
 import nl.vu.psy.rite.operations.OperationPropertyKeys;
 import nl.vu.psy.rite.operations.implementations.GenericOperation;
@@ -16,7 +19,7 @@ public class CopyInMongoFile extends GenericOperation {
 	private static final long serialVersionUID = 426425234812416095L;
 
 	public enum PropertyKeys implements OperationPropertyKeys {
-		FILENAME("filename", "", false), HOST("hostname", "", false), PORT("port", "", false), DBNAME("dbname", "", false), AUTH("auth", "false", false), USER("user", null, true), PASS("pass", null, true);
+		FILENAME("filename", "", false);
 
 		private final String key;
 		private final String defaultValue;
@@ -52,10 +55,19 @@ public class CopyInMongoFile extends GenericOperation {
 	@Override
 	public Operation call() throws Exception {
 		try {
-			Mongo mongo = new Mongo(getHostname(), getPort());
-			DB db = mongo.getDB(getDbName());
-			if (shouldAuth()) {
-				db.authenticate(getUserName(), getPassword().toCharArray());
+			String ritePropertiesFilename = Rite.getInstance().getProperty(Rite.PropertyKeys.HOST);
+			Properties hostProps = new Properties();
+			hostProps.load(new FileInputStream(ritePropertiesFilename));
+			String hostname = hostProps.getProperty("hostname");
+			int port = Integer.parseInt(hostProps.getProperty("port"));
+			String dbname = hostProps.getProperty("dbname");
+			boolean auth = Boolean.parseBoolean(hostProps.getProperty("auth"));
+			Mongo mongo = new Mongo(hostname, port);
+			DB db = mongo.getDB(dbname);
+			if (auth) {
+				String user = hostProps.getProperty("user");
+				String pass = hostProps.getProperty("pass");
+				db.authenticate(user, pass.toCharArray());
 			}
 			GridFS gfs = new GridFS(db);
 			String filename = getFileName();
@@ -65,6 +77,7 @@ public class CopyInMongoFile extends GenericOperation {
 			if (!f.exists()) {
 				throw new Exception("The file " + filename + " does not exist locally!");
 			}
+			mongo.close();
 		} catch (Exception e) {
 			this.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
 			this.fail();
@@ -83,45 +96,4 @@ public class CopyInMongoFile extends GenericOperation {
 		return getProperty(PropertyKeys.FILENAME);
 	}
 
-	public void setHostname(String host) {
-		setProperty(PropertyKeys.HOST, host);
-	}
-
-	public String getHostname() {
-		return getProperty(PropertyKeys.HOST);
-	}
-
-	public void setPort(int port) {
-		setProperty(PropertyKeys.PORT, Integer.toString(port));
-	}
-
-	public int getPort() {
-		return Integer.parseInt(getProperty(PropertyKeys.PORT));
-	}
-
-	public void setDbName(String dbName) {
-		setProperty(PropertyKeys.DBNAME, dbName);
-	}
-
-	public String getDbName() {
-		return getProperty(PropertyKeys.DBNAME);
-	}
-
-	public void setAuthCredentials(String user, String pass) {
-		setProperty(PropertyKeys.AUTH, Boolean.toString(true));
-		setProperty(PropertyKeys.USER, user);
-		setProperty(PropertyKeys.PASS, pass);
-	}
-
-	public boolean shouldAuth() {
-		return Boolean.parseBoolean(getProperty(PropertyKeys.AUTH));
-	}
-
-	private String getUserName() {
-		return getProperty(PropertyKeys.USER);
-	}
-
-	private String getPassword() {
-		return getProperty(PropertyKeys.PASS);
-	}
 }
