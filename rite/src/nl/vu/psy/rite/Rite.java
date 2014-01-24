@@ -359,7 +359,7 @@ public class Rite {
 
     }
 
-    private String getProperty(PropertyKeys prop) {
+    public String getProperty(PropertyKeys prop) {
         return prop.getProperty(properties);
     }
 

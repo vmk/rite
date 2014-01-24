@@ -61,6 +61,10 @@ public class RunBashScriptOperation extends GenericOperation {
         	bco.setCommandLine("/bin/bash " + f.getAbsolutePath());
         	bco.setCheckExitCode(true);
         	bco.call();
+        	if(Boolean.parseBoolean(bco.getProperty(GenericOperation.PropertyKeys.FAILED))){
+        		this.fail();
+        		this.setProperty(GenericOperation.PropertyKeys.ERROR, bco.getProperty(GenericOperation.PropertyKeys.FAILED));
+        	}
         } catch (Exception e) {
             this.setProperty(GenericOperation.PropertyKeys.ERROR, OperationUtilities.getStackTraceAsString(e));
             this.fail();

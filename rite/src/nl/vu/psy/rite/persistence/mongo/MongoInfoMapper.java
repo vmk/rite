@@ -108,6 +108,7 @@ public class MongoInfoMapper {
             while (lineScanner.hasNext()) {
                 result.append(lineScanner.next() + "\n");
             }
+            lineScanner.close();
         } catch (FileNotFoundException e) {
             result.append(e.getMessage());
         }
