@@ -52,6 +52,7 @@ public class Host {
     private String user;
     private String pass;
     private String dbname;
+    private String collection;
     private RecipeStore recipeStore;
     private ClientInfoStore infoStore;
     private ClientCommandStore commandStore;
@@ -73,6 +74,7 @@ public class Host {
             port = Integer.parseInt(hostProps.getProperty("port"));
             dbname = hostProps.getProperty("dbname");
             auth = Boolean.parseBoolean(hostProps.getProperty("auth"));
+            collection = hostProps.getProperty("collection");
             if (auth) {
                 user = hostProps.getProperty("user");
                 // TODO password should be handled in a different way. At the very least some encryption should be added.
@@ -89,11 +91,11 @@ public class Host {
         }
         if ("MongoDB".equals(type)) {
             if (auth) {
-                recipeStore = new MongoRecipeStore(hostname, port, dbname, "recipes", user, pass);
+                recipeStore = new MongoRecipeStore(hostname, port, dbname, collection, user, pass);
                 infoStore = new MongoInfoStore(hostname, port, dbname, "clientinfo", user, pass);
                 commandStore = new MongoCommandStore(hostname, port, dbname, "clientcommands", user, pass);
             } else {
-                recipeStore = new MongoRecipeStore(hostname, port, dbname, "recipes");
+                recipeStore = new MongoRecipeStore(hostname, port, dbname, collection);
                 infoStore = new MongoInfoStore(hostname, port, dbname, "clientinfo");
                 commandStore = new MongoCommandStore(hostname, port, dbname, "clientcommands");
             }
