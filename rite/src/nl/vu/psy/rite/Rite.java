@@ -41,7 +41,7 @@ import org.apache.commons.io.output.TeeOutputStream;
 
 /**
  * Rite
- * 
+ *
  * @author vm.kattenberg
  */
 public class Rite {
@@ -277,7 +277,7 @@ public class Rite {
                                 recipes++;
                                 if(r.hasFailed()) {
                                     failures ++;
-                                }                  
+                                }
                                 if(failures >= maxFailures) {
                                     System.out.println("The maximum number of recipe failures has been reached. This client will shutdown...");
                                     halt = true;
@@ -286,7 +286,7 @@ public class Rite {
                                 	System.out.println("The maximum number of completed recipes has been reached. This client will shutdown...");
                                     halt = true;
                                 }
-                                
+
                                 System.out.println("=== MARK: " + TimeStamp.dateToString(new Date()) + " ===");
                                 System.setOut(System.out);
                                 System.setErr(System.err);
