@@ -151,5 +151,21 @@ public class MongoStore implements RelicStore {
 		WriteResult update = relicCollection.update(bdo, MongoMapper.resolverDescriptorToDBObject(rd), true, false);
 		return update.getLastError().ok();
 	}
+	
+	@Override
+	public void clearRelicDB(){
+		String collection = relicCollection.getName();
+		relicCollection.drop();
+		
+		if (db.collectionExists(collection)) {
+			relicCollection = db.getCollection(collection);
+		} else {
+			DBObject dbo = new BasicDBObject();
+			dbo.put("capped", false);
+			relicCollection = db.createCollection(collection, dbo);
+		}
+		relicCollection.ensureIndex(new BasicDBObject("relic.identifier", 1).append("unique", true));
+		relicCollection.ensureIndex(new BasicDBObject("resolver.identifier", 1).append("unique", true));
+	}
 
 }

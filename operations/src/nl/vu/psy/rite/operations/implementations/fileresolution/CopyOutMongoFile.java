@@ -116,7 +116,9 @@ public class CopyOutMongoFile extends GenericOperation {
 			GridFS gfs = new GridFS(db);
 			String filename = getFileName();
 			File f = new File(filename);
-			f.delete();
+			if(f.exists()) {
+				f.delete();
+			}
 			gfs.remove(filename);
 			mongo.close();
 		} catch (Exception e) {

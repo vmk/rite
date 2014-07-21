@@ -37,4 +37,6 @@ public interface RelicStore {
 
     public abstract boolean putResolverDescriptor(ResolverDescriptor rd);
 
+	public abstract void clearRelicDB();
+
 }
