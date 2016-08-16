@@ -36,7 +36,7 @@
 		<jar destfile="${jarFile}" compress="true">
 			<fileset dir="${bin.dir}" includes="**/*.*" />
 			<manifest>
-				<attribute name="Main-Class" value="nl.vu.psy.rite.Rite" />
+				<attribute name="Main-Class" value="rite.Rite" />
 				<attribute name="Implementation-Version" value="${version.major}.${version.minor}.${build.number}-${build.id}-${version.date}" />
 				<attribute name="Class-Path" value="${dist.manifest.classpath}" />
 			</manifest>
