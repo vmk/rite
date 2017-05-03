@@ -17,12 +17,12 @@
 
 package nl.vu.psy.rite.examples;
 
-import nl.vu.psy.rite.exceptions.RiteException;
-import nl.vu.psy.rite.operations.Recipe;
-import nl.vu.psy.rite.operations.Step;
-import nl.vu.psy.rite.operations.implementations.examples.ExampleCommandlineOperation;
-import nl.vu.psy.rite.persistence.RecipeStore;
-import nl.vu.psy.rite.persistence.mongo.MongoRecipeStore;
+import rite.exceptions.RiteException;
+import rite.operations.Recipe;
+import rite.operations.Step;
+import rite.operations.implementations.examples.ExampleCommandlineOperation;
+import rite.persistence.RecipeStore;
+import rite.persistence.mongo.MongoRecipeStore;
 
 /**
  * CreateRecipesExample
@@ -37,12 +37,13 @@ public class CreateRecipesExample {
      */
     public static void main(String[] args) throws RiteException {
         // First set up a RecipeStore object for connection to a persistent store. In this case a MongoDB store is used.
-        RecipeStore store = new MongoRecipeStore("ds031477.mongolab.com", 31477, "ritedemo", "recipes", "rite", "demo");
+//        RecipeStore store = new MongoRecipeStore("ds031477.mongolab.com", 31477, "ritedemo", "recipes", "rite", "demo");
+        RecipeStore store = new MongoRecipeStore("localhost", 27017, "test", "recipes", "test", "test");
         for (int i = 0; i < (NUMMSGS - 1); i++) {
             Recipe r = new Recipe("Hello_" + i);
             Step s = new Step("say_hello");
             ExampleCommandlineOperation op = new ExampleCommandlineOperation();
-            op.setProperty(ExampleCommandlineOperation.PropertyKeys.ITERATIONS.getKey(), "1");
+            op.setProperty(ExampleCommandlineOperation.PropertyKeys.ITERATIONS.getKey(), "10");
             op.setProperty(ExampleCommandlineOperation.PropertyKeys.MESSAGE.getKey(), "Hello!");
             op.setProperty(ExampleCommandlineOperation.PropertyKeys.DELAY.getKey(), "0");
             s.add(op);
@@ -53,7 +54,7 @@ public class CreateRecipesExample {
         Step s = new Step("say_goodbye");
         ExampleCommandlineOperation op = new ExampleCommandlineOperation();
         op.setProperty(ExampleCommandlineOperation.PropertyKeys.ITERATIONS.getKey(), "1");
-        op.setProperty(ExampleCommandlineOperation.PropertyKeys.MESSAGE.getKey(), "Hello!");
+        op.setProperty(ExampleCommandlineOperation.PropertyKeys.MESSAGE.getKey(), "Goodbye!");
         op.setProperty(ExampleCommandlineOperation.PropertyKeys.DELAY.getKey(), "0");
         s.add(op);
         r.add(s);

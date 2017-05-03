@@ -17,14 +17,14 @@
 
 package nl.vu.psy.rite.examples;
 
-import nl.vu.psy.relic.Relic;
-import nl.vu.psy.relic.exceptions.RelicException;
-import nl.vu.psy.relic.persistence.RelicStore;
-import nl.vu.psy.relic.persistence.mongo.MongoStore;
-import nl.vu.psy.relic.resolvers.ResolverDescriptor;
-import nl.vu.psy.relic.resolvers.implementations.GridLCGResolver;
-import nl.vu.psy.relic.resolvers.implementations.GridSRMResolver;
-import nl.vu.psy.relic.resolvers.implementations.LocalFileSystemResolver;
+import rite.relic.Relic;
+import rite.relic.exceptions.RelicException;
+import rite.relic.persistence.RelicStore;
+import rite.relic.persistence.mongo.MongoStore;
+import rite.relic.resolvers.ResolverDescriptor;
+import rite.relic.resolvers.implementations.GridLCGResolver;
+import rite.relic.resolvers.implementations.GridSRMResolver;
+import rite.relic.resolvers.implementations.LocalFileSystemResolver;
 
 /**
  * CreateRelicsExample
