@@ -1,0 +1,20 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+group = "io.github.vmk.rite"
+
+mainClassName = "io.github.vmk.rite.Rite"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.mongodb', name: 'mongo-java-driver', version: '2.14.3'
+    compile group: 'commons-io', name: 'commons-io', version: '1.4'    
+
+    // Use JUnit test framework
+    testCompile 'junit:junit:4.12'
+}
+
