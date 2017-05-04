@@ -1,9 +1,35 @@
-# Java class files
-*.class
+# Package Files #
+/*.jar
+*.war
+*.ear
+*.zip
+*.tar
+*.tar.gz
 
-# generated files
+# Eclipse files
+.classpath
+.project
+
+# Idea files
+*.iml
+.idea
+
+# Gradle files
+.gradle
+
+# Generated files
+*.class
 bin/
 gen/
+build
+/target
+/.settings/**
+/.project
+/.classpath
+/*components*
 
-# Subversion subdirectories
-.svn*
+# Misc. files
+*.log
+.gradletasknamecache
+/tmp
+metastore_db/
