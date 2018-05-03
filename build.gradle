@@ -12,7 +12,8 @@ repositories {
 
 dependencies {
     compile group: 'org.mongodb', name: 'mongo-java-driver', version: '2.14.3'
-    compile group: 'commons-io', name: 'commons-io', version: '1.4'    
+    compile group: 'commons-io', name: 'commons-io', version: '1.4'
+    compile group: 'io.minio', name: 'minio', version: '4.0.0'
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
