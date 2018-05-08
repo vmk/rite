@@ -21,6 +21,7 @@ import io.github.vmk.rite.relic.exceptions.RelicException;
 import io.github.vmk.rite.relic.resolvers.implementations.GridLCGResolver;
 import io.github.vmk.rite.relic.resolvers.implementations.GridSRMResolver;
 import io.github.vmk.rite.relic.resolvers.implementations.LocalFileSystemResolver;
+import io.github.vmk.rite.relic.resolvers.implementations.MinioResolver;
 
 /**
  * RelicResolverFactory
@@ -44,6 +45,8 @@ public class RelicResolverFactory {
             return new GridSRMResolver();
         } else if (GridLCGResolver.ENVIRONMENT.equals(environment)) {
             return new GridLCGResolver();
+        } else if (MinioResolver.ENVIRONMENT.equals(environment)) {
+            return new MinioResolver();
         } else {
             throw new RelicException("No resolver could be found for environment: [" + environment + "].");
         }
