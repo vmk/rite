@@ -40,6 +40,7 @@ public class FileCache {
     private String user;
     private String pass;
     private String dbname;
+    private String collection;
     private String environment;
     private RelicFileCache fileCache;
 
@@ -54,6 +55,7 @@ public class FileCache {
             hostname = cacheProps.getProperty("hostname");
             port = Integer.parseInt(cacheProps.getProperty("port"));
             dbname = cacheProps.getProperty("dbname");
+            collection = cacheProps.getProperty("dbname");
             auth = Boolean.parseBoolean(cacheProps.getProperty("auth"));
             if (auth) {
                 user = cacheProps.getProperty("user");
@@ -74,13 +76,13 @@ public class FileCache {
         if ("MongoDB".equals(type)) {
             if (auth) {
                 try {
-                    store = new MongoStore(hostname, port, dbname, "relics", user, pass);
+                    store = new MongoStore(hostname, port, dbname, collection, user, pass);
                 } catch (RelicException e) {
                     throw new RiteException("Could not connect to relic store.", e);
                 }
             } else {
                 try {
-                    store = new MongoStore(hostname, port, dbname, "relics");
+                    store = new MongoStore(hostname, port, dbname, collection);
                 } catch (RelicException e) {
                     throw new RiteException("Could not connect to relic store.", e);
                 }
