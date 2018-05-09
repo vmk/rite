@@ -55,7 +55,7 @@ public class FileCache {
             hostname = cacheProps.getProperty("hostname");
             port = Integer.parseInt(cacheProps.getProperty("port"));
             dbname = cacheProps.getProperty("dbname");
-            collection = cacheProps.getProperty("dbname");
+            collection = cacheProps.getProperty("collection");
             auth = Boolean.parseBoolean(cacheProps.getProperty("auth"));
             if (auth) {
                 user = cacheProps.getProperty("user");
